@@ -19,6 +19,78 @@ class ETFAnalyzer:
             'TLT': 'iShares 20+ Year Treasury Bond ETF',
             'HYG': 'iShares iBoxx High Yield Corporate Bond ETF'
         }
+        
+        # Extended list of popular ETFs for search functionality
+        self.extended_etf_list = {
+            # Large Cap US
+            'SPY': 'SPDR S&P 500 ETF Trust',
+            'VOO': 'Vanguard S&P 500 ETF',
+            'IVV': 'iShares Core S&P 500 ETF',
+            'VTI': 'Vanguard Total Stock Market ETF',
+            'ITOT': 'iShares Core S&P Total US Stock Market ETF',
+            
+            # Technology
+            'QQQ': 'Invesco QQQ Trust',
+            'VGT': 'Vanguard Information Technology ETF',
+            'XLK': 'Technology Select Sector SPDR Fund',
+            'FTEC': 'Fidelity MSCI Information Technology ETF',
+            
+            # Small Cap
+            'IWM': 'iShares Russell 2000 ETF',
+            'VB': 'Vanguard Small-Cap ETF',
+            'VTWO': 'Vanguard Russell 2000 ETF',
+            
+            # International Developed
+            'EFA': 'iShares MSCI EAFE ETF',
+            'VEA': 'Vanguard FTSE Developed Markets ETF',
+            'IEFA': 'iShares Core MSCI EAFE IMI Index ETF',
+            'SCHF': 'Schwab International Equity ETF',
+            
+            # Emerging Markets
+            'EEM': 'iShares MSCI Emerging Markets ETF',
+            'VWO': 'Vanguard FTSE Emerging Markets ETF',
+            'IEMG': 'iShares Core MSCI Emerging Markets IMI Index ETF',
+            
+            # Bonds
+            'BND': 'Vanguard Total Bond Market ETF',
+            'AGG': 'iShares Core U.S. Aggregate Bond ETF',
+            'TLT': 'iShares 20+ Year Treasury Bond ETF',
+            'HYG': 'iShares iBoxx High Yield Corporate Bond ETF',
+            'LQD': 'iShares iBoxx Investment Grade Corporate Bond ETF',
+            
+            # Real Estate
+            'VNQ': 'Vanguard Real Estate ETF',
+            'SCHH': 'Schwab U.S. REIT ETF',
+            'IYR': 'iShares U.S. Real Estate ETF',
+            
+            # Commodities
+            'GLD': 'SPDR Gold Shares',
+            'SLV': 'iShares Silver Trust',
+            'DBC': 'Invesco DB Commodity Index Tracking Fund',
+            'USO': 'United States Oil Fund',
+            
+            # Sector ETFs
+            'XLF': 'Financial Select Sector SPDR Fund',
+            'XLE': 'Energy Select Sector SPDR Fund',
+            'XLV': 'Health Care Select Sector SPDR Fund',
+            'XLI': 'Industrial Select Sector SPDR Fund',
+            'XLY': 'Consumer Discretionary Select Sector SPDR Fund',
+            'XLP': 'Consumer Staples Select Sector SPDR Fund',
+            'XLU': 'Utilities Select Sector SPDR Fund',
+            'XLB': 'Materials Select Sector SPDR Fund',
+            
+            # Growth/Value
+            'VUG': 'Vanguard Growth ETF',
+            'VTV': 'Vanguard Value ETF',
+            'IWF': 'iShares Russell 1000 Growth ETF',
+            'IWD': 'iShares Russell 1000 Value ETF',
+            
+            # Dividend ETFs
+            'VYM': 'Vanguard High Dividend Yield ETF',
+            'SCHD': 'Schwab US Dividend Equity ETF',
+            'DVY': 'iShares Select Dividend ETF',
+            'HDV': 'iShares High Dividend ETF'
+        }
     
     def get_etf_info(self, symbol):
         """Get basic ETF information"""
@@ -170,3 +242,19 @@ class ETFAnalyzer:
         except Exception as e:
             st.error(f"Error getting summary for {symbol}: {str(e)}")
             return None
+    
+    def search_etf(self, search_term):
+        """Search for ETFs by symbol or name"""
+        search_term = search_term.upper().strip()
+        results = []
+        
+        for symbol, name in self.extended_etf_list.items():
+            if (search_term in symbol.upper() or 
+                search_term in name.upper()):
+                results.append({'symbol': symbol, 'name': name})
+        
+        return results
+    
+    def get_all_etfs(self):
+        """Get all available ETFs for selection"""
+        return self.extended_etf_list

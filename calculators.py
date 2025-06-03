@@ -8,16 +8,20 @@ class InvestmentCalculator:
     def __init__(self):
         pass
     
-    def calculate_investment_growth(self, symbol, initial_investment):
-        """Calculate how an investment would have grown since inception"""
+    def calculate_investment_growth(self, symbol, initial_investment, include_expense_ratio=True):
+        """Calculate how an investment would have grown since inception, including expense ratio impact"""
         try:
             ticker = yf.Ticker(symbol)
             
-            # Get maximum historical data
+            # Get maximum historical data and ETF info
             hist = ticker.history(period="max")
+            info = ticker.info
             
             if hist.empty:
                 return None
+            
+            # Get expense ratio
+            expense_ratio = info.get('annualReportExpenseRatio', 0.005)  # Default to 0.5% if not available
             
             # Get first and last prices
             first_price = hist['Close'].iloc[0]
@@ -28,23 +32,45 @@ class InvestmentCalculator:
             end_date = hist.index[-1]
             years = (end_date - start_date).days / 365.25
             
-            # Calculate investment growth
+            # Calculate investment growth WITHOUT expense ratio (gross returns)
             price_multiplier = last_price / first_price
-            current_value = initial_investment * price_multiplier
-            total_return = ((current_value / initial_investment) - 1) * 100
+            gross_current_value = initial_investment * price_multiplier
+            gross_total_return = ((gross_current_value / initial_investment) - 1) * 100
+            gross_cagr = ((gross_current_value / initial_investment) ** (1/years) - 1) * 100
             
-            # Calculate CAGR
-            cagr = ((current_value / initial_investment) ** (1/years) - 1) * 100
+            # Calculate investment growth WITH expense ratio (net returns)
+            if include_expense_ratio and expense_ratio > 0:
+                # Apply expense ratio compound reduction over the years
+                expense_multiplier = (1 - expense_ratio) ** years
+                net_current_value = gross_current_value * expense_multiplier
+                net_total_return = ((net_current_value / initial_investment) - 1) * 100
+                net_cagr = ((net_current_value / initial_investment) ** (1/years) - 1) * 100
+                
+                # Calculate total fees paid
+                total_fees = gross_current_value - net_current_value
+            else:
+                net_current_value = gross_current_value
+                net_total_return = gross_total_return
+                net_cagr = gross_cagr
+                total_fees = 0
             
-            # Create growth data for charting
-            growth_data = self._create_growth_chart_data(hist, initial_investment, first_price)
+            # Create growth data for charting (including expense ratio impact)
+            growth_data = self._create_growth_chart_data(hist, initial_investment, first_price, expense_ratio if include_expense_ratio else 0)
             
             return {
                 'symbol': symbol,
                 'initial_investment': initial_investment,
-                'current_value': current_value,
-                'total_return': total_return,
-                'cagr': cagr,
+                'gross_current_value': gross_current_value,
+                'net_current_value': net_current_value,
+                'current_value': net_current_value,  # Default to net value
+                'gross_total_return': gross_total_return,
+                'net_total_return': net_total_return,
+                'total_return': net_total_return,  # Default to net return
+                'gross_cagr': gross_cagr,
+                'net_cagr': net_cagr,
+                'cagr': net_cagr,  # Default to net CAGR
+                'expense_ratio': expense_ratio * 100,  # Convert to percentage
+                'total_fees': total_fees,
                 'years': years,
                 'start_date': start_date.date(),
                 'end_date': end_date.date(),
@@ -55,8 +81,8 @@ class InvestmentCalculator:
             st.error(f"Error calculating investment growth for {symbol}: {str(e)}")
             return None
     
-    def _create_growth_chart_data(self, hist, initial_investment, first_price):
-        """Create data for growth chart visualization"""
+    def _create_growth_chart_data(self, hist, initial_investment, first_price, expense_ratio=0):
+        """Create data for growth chart visualization with expense ratio impact"""
         try:
             # Sample data points for chart (monthly intervals to avoid too many points)
             if len(hist) > 60:  # More than 60 days of data
@@ -66,13 +92,28 @@ class InvestmentCalculator:
             else:
                 sampled_hist = hist.copy()
             
-            # Calculate portfolio value over time
-            sampled_hist['Portfolio_Value'] = (sampled_hist['Close'] / first_price) * initial_investment
+            # Calculate portfolio value over time (gross returns)
+            sampled_hist['Gross_Portfolio_Value'] = (sampled_hist['Close'] / first_price) * initial_investment
+            
+            # Calculate portfolio value with expense ratio impact
+            if expense_ratio > 0:
+                # Calculate years elapsed for each data point
+                start_date = sampled_hist.index[0]
+                sampled_hist['Years_Elapsed'] = [(date - start_date).days / 365.25 for date in sampled_hist.index]
+                
+                # Apply compound expense ratio reduction
+                sampled_hist['Net_Portfolio_Value'] = (
+                    sampled_hist['Gross_Portfolio_Value'] * 
+                    ((1 - expense_ratio) ** sampled_hist['Years_Elapsed'])
+                )
+            else:
+                sampled_hist['Net_Portfolio_Value'] = sampled_hist['Gross_Portfolio_Value']
             
             # Prepare data for plotly
             chart_data = pd.DataFrame({
                 'Date': sampled_hist.index,
-                'Portfolio_Value': sampled_hist['Portfolio_Value']
+                'Gross_Portfolio_Value': sampled_hist['Gross_Portfolio_Value'],
+                'Portfolio_Value': sampled_hist['Net_Portfolio_Value']  # Net value after fees
             })
             
             return chart_data
