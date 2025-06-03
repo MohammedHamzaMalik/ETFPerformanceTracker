@@ -383,13 +383,24 @@ elif page == "ETF Comparison":
     # ETF selection for comparison
     col1, col2 = st.columns(2)
     
-    etf_options = ['SPY', 'QQQ', 'VTI', 'IWM', 'EFA', 'EEM', 'VNQ', 'GLD', 'TLT', 'HYG']
+    all_etfs = etf_analyzer.get_all_etfs()
+    etf_options = sorted(list(all_etfs.keys()))
     
     with col1:
-        etf1 = st.selectbox("Select first ETF:", etf_options, index=0)
+        etf1 = st.selectbox(
+            "Select first ETF:", 
+            etf_options, 
+            index=0,
+            format_func=lambda x: f"{x} - {all_etfs[x]}"
+        )
     
     with col2:
-        etf2 = st.selectbox("Select second ETF:", etf_options, index=1)
+        etf2 = st.selectbox(
+            "Select second ETF:", 
+            etf_options, 
+            index=1,
+            format_func=lambda x: f"{x} - {all_etfs[x]}"
+        )
     
     if st.button("Compare ETFs"):
         with st.spinner("Comparing ETFs..."):
@@ -397,21 +408,41 @@ elif page == "ETF Comparison":
                 comparison = calculator.compare_etfs(etf1, etf2, 1000)
                 
                 if comparison:
-                    st.subheader(f"📊 {etf1} vs {etf2} Comparison")
+                    st.subheader(f"📊 {etf1} vs {etf2} Comparison ($1,000 Investment)")
                     
-                    # Create comparison table
+                    # Create comprehensive comparison table
                     comp_data = {
-                        'Metric': ['Current Value', 'Total Return (%)', 'CAGR (%)', 'Years'],
+                        'Metric': [
+                            'Net Value (After Fees)', 
+                            'Gross Value (Before Fees)',
+                            'Net Total Return (%)', 
+                            'Gross Total Return (%)',
+                            'Net CAGR (%)',
+                            'Gross CAGR (%)',
+                            'Total Fees Paid',
+                            'Expense Ratio (%)',
+                            'Years'
+                        ],
                         etf1: [
-                            f"${comparison[etf1]['current_value']:,.2f}",
-                            f"{comparison[etf1]['total_return']:.1f}%",
-                            f"{comparison[etf1]['cagr']:.2f}%",
+                            f"${comparison[etf1]['net_current_value']:,.2f}",
+                            f"${comparison[etf1]['gross_current_value']:,.2f}",
+                            f"{comparison[etf1]['net_total_return']:.1f}%",
+                            f"{comparison[etf1]['gross_total_return']:.1f}%",
+                            f"{comparison[etf1]['net_cagr']:.2f}%",
+                            f"{comparison[etf1]['gross_cagr']:.2f}%",
+                            f"${comparison[etf1]['total_fees']:,.2f}",
+                            f"{comparison[etf1]['expense_ratio']:.3f}%",
                             f"{comparison[etf1]['years']:.1f}"
                         ],
                         etf2: [
-                            f"${comparison[etf2]['current_value']:,.2f}",
-                            f"{comparison[etf2]['total_return']:.1f}%",
-                            f"{comparison[etf2]['cagr']:.2f}%",
+                            f"${comparison[etf2]['net_current_value']:,.2f}",
+                            f"${comparison[etf2]['gross_current_value']:,.2f}",
+                            f"{comparison[etf2]['net_total_return']:.1f}%",
+                            f"{comparison[etf2]['gross_total_return']:.1f}%",
+                            f"{comparison[etf2]['net_cagr']:.2f}%",
+                            f"{comparison[etf2]['gross_cagr']:.2f}%",
+                            f"${comparison[etf2]['total_fees']:,.2f}",
+                            f"{comparison[etf2]['expense_ratio']:.3f}%",
                             f"{comparison[etf2]['years']:.1f}"
                         ]
                     }
@@ -419,15 +450,28 @@ elif page == "ETF Comparison":
                     comp_df = pd.DataFrame(comp_data)
                     st.dataframe(comp_df, use_container_width=True, hide_index=True)
                     
-                    # Determine winner
-                    if comparison[etf1]['current_value'] > comparison[etf2]['current_value']:
+                    # Determine winner based on net returns
+                    if comparison[etf1]['net_current_value'] > comparison[etf2]['net_current_value']:
                         winner = etf1
-                        winner_value = comparison[etf1]['current_value']
+                        winner_value = comparison[etf1]['net_current_value']
+                        loser_value = comparison[etf2]['net_current_value']
                     else:
                         winner = etf2
-                        winner_value = comparison[etf2]['current_value']
+                        winner_value = comparison[etf2]['net_current_value']
+                        loser_value = comparison[etf1]['net_current_value']
                     
-                    st.success(f"🏆 **{winner}** performed better with a final value of **${winner_value:,.2f}**")
+                    difference = winner_value - loser_value
+                    st.success(f"🏆 **{winner}** performed better with a net value of **${winner_value:,.2f}** (${difference:,.2f} more)")
+                    
+                    # Fee impact analysis
+                    etf1_fee_impact = comparison[etf1]['total_fees']
+                    etf2_fee_impact = comparison[etf2]['total_fees']
+                    
+                    if etf1_fee_impact != etf2_fee_impact:
+                        if etf1_fee_impact > etf2_fee_impact:
+                            st.info(f"💡 **Fee Analysis:** {etf1} charged ${etf1_fee_impact - etf2_fee_impact:.2f} more in fees than {etf2}")
+                        else:
+                            st.info(f"💡 **Fee Analysis:** {etf2} charged ${etf2_fee_impact - etf1_fee_impact:.2f} more in fees than {etf1}")
                 
                 else:
                     st.error("Unable to compare ETFs. Please try again.")

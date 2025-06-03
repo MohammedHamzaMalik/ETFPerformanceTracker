@@ -72,8 +72,8 @@ class InvestmentCalculator:
                 'expense_ratio': expense_ratio * 100,  # Convert to percentage
                 'total_fees': total_fees,
                 'years': years,
-                'start_date': start_date.date(),
-                'end_date': end_date.date(),
+                'start_date': start_date.strftime('%Y-%m-%d'),
+                'end_date': end_date.strftime('%Y-%m-%d'),
                 'growth_data': growth_data
             }
             

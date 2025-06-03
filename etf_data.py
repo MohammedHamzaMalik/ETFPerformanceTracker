@@ -168,14 +168,17 @@ class ETFAnalyzer:
                     continue
                 
                 # Prepare data
+                expense_ratio_pct = etf_info['expense_ratio'] * 100 if etf_info['expense_ratio'] and etf_info['expense_ratio'] is not None else 0.5
+                aum_billions = round(etf_info['aum'] / 1e9, 1) if etf_info['aum'] and etf_info['aum'] is not None else 'N/A'
+                
                 result = {
                     'Symbol': symbol,
                     'Name': etf_info['name'],
                     'CAGR (%)': round(cagr, 2),
                     'Inception Date': inception_date.strftime('%Y-%m-%d') if inception_date else 'Unknown',
                     'Years': round(years, 1),
-                    'Expense Ratio (%)': etf_info['expense_ratio'] * 100 if etf_info['expense_ratio'] else 0.5,
-                    'AUM (Billions)': round(etf_info['aum'] / 1e9, 1) if etf_info['aum'] else 'N/A'
+                    'Expense Ratio (%)': expense_ratio_pct,
+                    'AUM (Billions)': aum_billions
                 }
                 
                 results.append(result)
