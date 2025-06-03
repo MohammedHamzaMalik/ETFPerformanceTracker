@@ -10,9 +10,14 @@ from calculators import InvestmentCalculator
 
 # Page configuration
 st.set_page_config(
-    page_title="ETF Performance Analyzer",
-    page_icon="📈",
-    layout="wide"
+    page_title="Global ETF Performance Analyzer - Best ETFs Worldwide | Investment Returns Calculator",
+    page_icon="🌍",
+    layout="wide",
+    menu_items={
+        'Get Help': 'https://github.com/etf-analyzer/help',
+        'Report a bug': "https://github.com/etf-analyzer/issues",
+        'About': "Global ETF Performance Analyzer - Compare ETFs from around the world and calculate investment returns with real-time data."
+    }
 )
 
 # Initialize session state
@@ -21,18 +26,61 @@ if 'etf_data' not in st.session_state:
 if 'last_update' not in st.session_state:
     st.session_state.last_update = None
 
-# Main title
-st.title("📈 ETF Performance Analyzer")
-st.markdown("**Discover top-performing ETFs and calculate your potential investment returns**")
+# SEO-optimized headers and content
+st.title("🌍 Global ETF Performance Analyzer")
+st.markdown("**Find the Best ETFs Worldwide | Calculate Investment Returns | Compare Global ETF Performance**")
 
-# Sidebar for navigation
-st.sidebar.title("Navigation")
-page = st.sidebar.selectbox("Choose a section:", 
-                           ["Top Performers", "ETF Search & Analysis", "Investment Calculator", "ETF Comparison"])
+# SEO meta content
+st.markdown("""
+<meta name="description" content="Global ETF Performance Analyzer - Find best performing ETFs from USA, Europe, Asia, and worldwide. Calculate investment returns with real-time data and expense ratio impact. Compare ETFs by country and performance.">
+<meta name="keywords" content="ETF performance, best ETFs worldwide, ETF calculator, investment returns, global ETFs, ETF comparison, CAGR calculator, expense ratio, ETF analysis, international ETFs">
+<meta name="author" content="Global ETF Performance Analyzer">
+<meta property="og:title" content="Global ETF Performance Analyzer - Best ETFs Worldwide">
+<meta property="og:description" content="Compare ETFs from around the world and calculate investment returns with real-time data">
+<meta property="og:type" content="website">
+""", unsafe_allow_html=True)
+
+# Prominent search and value proposition
+st.markdown("### 🔍 Search ETFs from Any Country - USA, Europe, Asia & More")
+st.markdown("**Over 500+ ETFs from 20+ countries** | Real-time performance data | Free investment calculator")
 
 # Initialize analyzers
 etf_analyzer = ETFAnalyzer()
 calculator = InvestmentCalculator()
+
+# Sidebar for navigation
+st.sidebar.title("🌍 Global ETF Navigator")
+page = st.sidebar.selectbox("Choose a section:", 
+                           ["🏆 Top Global Performers", 
+                            "🔍 Search ETFs by Country", 
+                            "💰 Investment Calculator", 
+                            "⚖️ Compare ETFs",
+                            "📊 Country Analysis"])
+
+# Country filter in sidebar
+st.sidebar.markdown("---")
+st.sidebar.subheader("Filter by Country/Region")
+available_countries = etf_analyzer.get_available_countries()
+country_display_names = {
+    'USA': '🇺🇸 United States',
+    'CANADA': '🇨🇦 Canada', 
+    'UK': '🇬🇧 United Kingdom',
+    'GERMANY': '🇩🇪 Germany',
+    'FRANCE': '🇫🇷 France',
+    'JAPAN': '🇯🇵 Japan',
+    'AUSTRALIA': '🇦🇺 Australia',
+    'CHINA': '🇨🇳 China',
+    'INDIA': '🇮🇳 India',
+    'SOUTH_KOREA': '🇰🇷 South Korea',
+    'EMERGING_MARKETS': '🌍 Emerging Markets',
+    'INTERNATIONAL_DEVELOPED': '🌐 International Developed'
+}
+
+selected_country = st.sidebar.selectbox(
+    "Select Country/Region:",
+    ["All Countries"] + available_countries,
+    format_func=lambda x: country_display_names.get(x, x) if x != "All Countries" else "🌍 All Countries"
+)
 
 # Cache data for 1 hour to avoid repeated API calls
 @st.cache_data(ttl=3600)
@@ -40,7 +88,41 @@ def load_etf_data():
     return etf_analyzer.get_top_etfs()
 
 # Main content based on selected page
-if page == "Top Performers":
+if page == "🏆 Top Global Performers":
+    st.header("🏆 Top Performing ETFs Worldwide")
+    
+    # SEO-optimized content
+    st.markdown(f"""
+    **Best Performing ETFs from {country_display_names.get(selected_country, selected_country) if selected_country != "All Countries" else "Around the World"}**
+    
+    Find the highest returning ETFs with real-time CAGR calculations, expense ratios, and performance metrics.
+    """)
+    
+    # Country-specific description
+    if selected_country != "All Countries":
+        country_descriptions = {
+            'USA': 'Discover top-performing US ETFs including S&P 500, Nasdaq, technology, and sector-specific funds.',
+            'CANADA': 'Explore best Canadian ETFs tracking TSX, broad market, and Canadian-specific investments.',
+            'UK': 'Find top UK and European UCITS ETFs including FTSE 100, S&P 500, and global diversified funds.',
+            'GERMANY': 'German and European ETFs including DAX, EURO STOXX 50, and broad European market exposure.',
+            'FRANCE': 'French market ETFs including CAC 40 and European market funds.',
+            'JAPAN': 'Japanese market ETFs tracking Nikkei 225, TOPIX, and Japan-focused investments.',
+            'AUSTRALIA': 'Australian ETFs including ASX 200, broad market, and Australian-specific investments.',
+            'CHINA': 'Chinese market ETFs including large-cap, internet, and A-shares exposure.',
+            'INDIA': 'Indian market ETFs including broad market and small-cap exposure.',
+            'EMERGING_MARKETS': 'Emerging markets ETFs providing exposure to developing economies worldwide.',
+            'INTERNATIONAL_DEVELOPED': 'International developed market ETFs excluding the United States.'
+        }
+        if selected_country in country_descriptions:
+            st.info(f"**{country_display_names.get(selected_country)}**: {country_descriptions[selected_country]}")
+    
+    # Filter ETFs by country if selected
+    if selected_country != "All Countries":
+        filtered_etfs = etf_analyzer.get_etfs_by_country(selected_country)
+        if not filtered_etfs:
+            st.warning(f"No ETF data available for {country_display_names.get(selected_country, selected_country)}")
+            st.stop()
+    
     st.header("🏆 Top Performing ETFs")
     
     # Add explanatory text for beginners
@@ -116,7 +198,7 @@ if page == "Top Performers":
             st.error(f"Error loading data: {str(e)}")
             st.info("This might be due to API rate limits. Please try again in a few minutes.")
 
-elif page == "ETF Search & Analysis":
+elif page == "🔍 Search ETFs by Country":
     st.header("🔍 ETF Search & Analysis")
     
     # Explanatory section

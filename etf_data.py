@@ -20,77 +20,203 @@ class ETFAnalyzer:
             'HYG': 'iShares iBoxx High Yield Corporate Bond ETF'
         }
         
-        # Extended list of popular ETFs for search functionality
-        self.extended_etf_list = {
-            # Large Cap US
-            'SPY': 'SPDR S&P 500 ETF Trust',
-            'VOO': 'Vanguard S&P 500 ETF',
-            'IVV': 'iShares Core S&P 500 ETF',
-            'VTI': 'Vanguard Total Stock Market ETF',
-            'ITOT': 'iShares Core S&P Total US Stock Market ETF',
+        # Global ETF database organized by country and region
+        self.global_etf_database = {
+            # United States
+            'USA': {
+                # Large Cap US
+                'SPY': 'SPDR S&P 500 ETF Trust',
+                'VOO': 'Vanguard S&P 500 ETF',
+                'IVV': 'iShares Core S&P 500 ETF',
+                'VTI': 'Vanguard Total Stock Market ETF',
+                'ITOT': 'iShares Core S&P Total US Stock Market ETF',
+                'SCHX': 'Schwab US Large-Cap ETF',
+                'SCHA': 'Schwab US Small-Cap ETF',
+                'SCHM': 'Schwab US Mid-Cap ETF',
+                'SCHB': 'Schwab US Broad Market ETF',
+                
+                # Technology
+                'QQQ': 'Invesco QQQ Trust',
+                'VGT': 'Vanguard Information Technology ETF',
+                'XLK': 'Technology Select Sector SPDR Fund',
+                'FTEC': 'Fidelity MSCI Information Technology ETF',
+                'SOXX': 'iShares Semiconductor ETF',
+                'IGV': 'iShares Expanded Tech-Software Sector ETF',
+                'ARKK': 'ARK Innovation ETF',
+                'ARKQ': 'ARK Autonomous Technology & Robotics ETF',
+                
+                # Small Cap
+                'IWM': 'iShares Russell 2000 ETF',
+                'VB': 'Vanguard Small-Cap ETF',
+                'VTWO': 'Vanguard Russell 2000 ETF',
+                'IJR': 'iShares Core S&P Small-Cap ETF',
+                
+                # Bonds
+                'BND': 'Vanguard Total Bond Market ETF',
+                'AGG': 'iShares Core U.S. Aggregate Bond ETF',
+                'TLT': 'iShares 20+ Year Treasury Bond ETF',
+                'HYG': 'iShares iBoxx High Yield Corporate Bond ETF',
+                'LQD': 'iShares iBoxx Investment Grade Corporate Bond ETF',
+                'SCHZ': 'Schwab Intermediate-Term Treasury ETF',
+                'VTEB': 'Vanguard Tax-Exempt Bond ETF',
+                
+                # Real Estate
+                'VNQ': 'Vanguard Real Estate ETF',
+                'SCHH': 'Schwab U.S. REIT ETF',
+                'IYR': 'iShares U.S. Real Estate ETF',
+                'XLRE': 'Real Estate Select Sector SPDR Fund',
+                
+                # Commodities
+                'GLD': 'SPDR Gold Shares',
+                'SLV': 'iShares Silver Trust',
+                'DBC': 'Invesco DB Commodity Index Tracking Fund',
+                'USO': 'United States Oil Fund',
+                'PDBC': 'Invesco Optimum Yield Diversified Commodity Strategy No K-1 ETF',
+                
+                # Sector ETFs
+                'XLF': 'Financial Select Sector SPDR Fund',
+                'XLE': 'Energy Select Sector SPDR Fund',
+                'XLV': 'Health Care Select Sector SPDR Fund',
+                'XLI': 'Industrial Select Sector SPDR Fund',
+                'XLY': 'Consumer Discretionary Select Sector SPDR Fund',
+                'XLP': 'Consumer Staples Select Sector SPDR Fund',
+                'XLU': 'Utilities Select Sector SPDR Fund',
+                'XLB': 'Materials Select Sector SPDR Fund',
+                
+                # Dividend ETFs
+                'VYM': 'Vanguard High Dividend Yield ETF',
+                'SCHD': 'Schwab US Dividend Equity ETF',
+                'DVY': 'iShares Select Dividend ETF',
+                'HDV': 'iShares High Dividend ETF',
+                'NOBL': 'ProShares S&P 500 Dividend Aristocrats ETF',
+                'DGRO': 'iShares Core Dividend Growth ETF'
+            },
             
-            # Technology
-            'QQQ': 'Invesco QQQ Trust',
-            'VGT': 'Vanguard Information Technology ETF',
-            'XLK': 'Technology Select Sector SPDR Fund',
-            'FTEC': 'Fidelity MSCI Information Technology ETF',
+            # Canada
+            'CANADA': {
+                'VTI.TO': 'Vanguard Total Stock Market Index ETF',
+                'VFV.TO': 'Vanguard S&P 500 Index ETF',
+                'VCN.TO': 'Vanguard FTSE Canada All Cap Index ETF',
+                'TDB902.TO': 'TD Canadian Index Fund',
+                'XIU.TO': 'iShares Core S&P/TSX Capped Composite Index ETF',
+                'VBR.TO': 'Vanguard Canadian Aggregate Bond Index ETF',
+                'VSP.TO': 'Vanguard S&P 500 Index ETF',
+                'VEA.TO': 'Vanguard FTSE Developed Markets ETF',
+                'VGRO.TO': 'Vanguard Growth ETF Portfolio',
+                'VBAL.TO': 'Vanguard Balanced ETF Portfolio'
+            },
             
-            # Small Cap
-            'IWM': 'iShares Russell 2000 ETF',
-            'VB': 'Vanguard Small-Cap ETF',
-            'VTWO': 'Vanguard Russell 2000 ETF',
+            # Europe - UK
+            'UK': {
+                'VUSA.L': 'Vanguard S&P 500 UCITS ETF',
+                'VWRL.L': 'Vanguard FTSE All-World UCITS ETF',
+                'VMID.L': 'Vanguard FTSE 250 UCITS ETF',
+                'VUKE.L': 'Vanguard FTSE 100 UCITS ETF',
+                'VERX.L': 'Vanguard FTSE Emerging Markets UCITS ETF',
+                'VHYL.L': 'Vanguard FTSE All-World High Dividend Yield UCITS ETF',
+                'VGOV.L': 'Vanguard UK Government Bond UCITS ETF',
+                'ISF.L': 'iShares Core S&P 500 UCITS ETF',
+                'IWDA.L': 'iShares Core MSCI World UCITS ETF',
+                'IUKD.L': 'iShares Core FTSE 100 UCITS ETF'
+            },
             
-            # International Developed
-            'EFA': 'iShares MSCI EAFE ETF',
-            'VEA': 'Vanguard FTSE Developed Markets ETF',
-            'IEFA': 'iShares Core MSCI EAFE IMI Index ETF',
-            'SCHF': 'Schwab International Equity ETF',
+            # Europe - Germany
+            'GERMANY': {
+                'EXS1.DE': 'iShares Core DAX UCITS ETF',
+                'EXXT.DE': 'iShares Core EURO STOXX 50 UCITS ETF',
+                'EUNL.DE': 'iShares Core MSCI Europe UCITS ETF',
+                'IWDA.DE': 'iShares Core MSCI World UCITS ETF',
+                'VWCE.DE': 'Vanguard FTSE All-World UCITS ETF',
+                'VUSA.DE': 'Vanguard S&P 500 UCITS ETF',
+                'A1JX52.DE': 'Vanguard FTSE All-World UCITS ETF',
+                'DBX1MW.DE': 'Xtrackers MSCI World UCITS ETF',
+                'LYX0YD.DE': 'Lyxor EURO STOXX 50 (DR) UCITS ETF'
+            },
+            
+            # Europe - France
+            'FRANCE': {
+                'CW8.PA': 'iShares Core MSCI World UCITS ETF',
+                'CAC.PA': 'Lyxor CAC 40 (DR) UCITS ETF',
+                'EWQ': 'iShares MSCI France ETF',
+                'EWGS.PA': 'iShares MSCI EMU Large Cap UCITS ETF',
+                'EWQS.PA': 'iShares Edge MSCI Europe Quality Factor UCITS ETF'
+            },
+            
+            # Asia Pacific - Japan
+            'JAPAN': {
+                'EWJ': 'iShares MSCI Japan ETF',
+                '1306.T': 'TOPIX ETF',
+                '1321.T': 'Nikkei 225 ETF',
+                'VEA': 'Vanguard FTSE Developed Markets ETF (includes Japan)',
+                'IEFA': 'iShares Core MSCI EAFE ETF (includes Japan)',
+                'DXJ': 'WisdomTree Japan Hedged Equity Fund',
+                'JPXN': 'iShares JPX-Nikkei 400 ETF',
+                'HEWJ': 'iShares Currency Hedged MSCI Japan ETF'
+            },
+            
+            # Asia Pacific - Australia
+            'AUSTRALIA': {
+                'VAS.AX': 'Vanguard Australian Shares Index ETF',
+                'IOZ.AX': 'iShares Core S&P/ASX 200 ETF',
+                'VGS.AX': 'Vanguard MSCI Index International Shares ETF',
+                'IVV.AX': 'iShares Core S&P 500 ETF',
+                'VTS.AX': 'Vanguard US Total Market Shares Index ETF',
+                'VAE.AX': 'Vanguard FTSE Emerging Markets Shares ETF',
+                'VGB.AX': 'Vanguard Australian Government Bond Index ETF',
+                'VDHG.AX': 'Vanguard Diversified High Growth Index ETF'
+            },
+            
+            # Asia - China/Hong Kong
+            'CHINA': {
+                'FXI': 'iShares China Large-Cap ETF',
+                'MCHI': 'iShares MSCI China ETF',
+                'ASHR': 'Xtrackers Harvest CSI 300 China A-Shares ETF',
+                'KWEB': 'KraneShares CSI China Internet ETF',
+                'GXC': 'SPDR S&P China ETF',
+                'YINN': 'Direxion Daily FTSE China Bull 3X Shares',
+                '2800.HK': 'Tracker Fund of Hong Kong',
+                '3040.HK': 'iShares MSCI Asia ex Japan ETF'
+            },
+            
+            # Asia - India
+            'INDIA': {
+                'INDA': 'iShares MSCI India ETF',
+                'INDY': 'iShares MSCI India Small-Cap ETF',
+                'MINDX': 'iShares MSCI India ETF',
+                'EPI': 'WisdomTree India Earnings Fund',
+                'SCIN': 'Schwab Fundamental Emerging Markets Large Company Index ETF'
+            },
+            
+            # Asia - South Korea
+            'SOUTH_KOREA': {
+                'EWY': 'iShares MSCI South Korea ETF',
+                'FLKR': 'Franklin FTSE South Korea ETF'
+            },
             
             # Emerging Markets
-            'EEM': 'iShares MSCI Emerging Markets ETF',
-            'VWO': 'Vanguard FTSE Emerging Markets ETF',
-            'IEMG': 'iShares Core MSCI Emerging Markets IMI Index ETF',
+            'EMERGING_MARKETS': {
+                'EEM': 'iShares MSCI Emerging Markets ETF',
+                'VWO': 'Vanguard FTSE Emerging Markets ETF',
+                'IEMG': 'iShares Core MSCI Emerging Markets IMI Index ETF',
+                'SPEM': 'SPDR Portfolio Emerging Markets ETF',
+                'SCHE': 'Schwab Emerging Markets Equity ETF'
+            },
             
-            # Bonds
-            'BND': 'Vanguard Total Bond Market ETF',
-            'AGG': 'iShares Core U.S. Aggregate Bond ETF',
-            'TLT': 'iShares 20+ Year Treasury Bond ETF',
-            'HYG': 'iShares iBoxx High Yield Corporate Bond ETF',
-            'LQD': 'iShares iBoxx Investment Grade Corporate Bond ETF',
-            
-            # Real Estate
-            'VNQ': 'Vanguard Real Estate ETF',
-            'SCHH': 'Schwab U.S. REIT ETF',
-            'IYR': 'iShares U.S. Real Estate ETF',
-            
-            # Commodities
-            'GLD': 'SPDR Gold Shares',
-            'SLV': 'iShares Silver Trust',
-            'DBC': 'Invesco DB Commodity Index Tracking Fund',
-            'USO': 'United States Oil Fund',
-            
-            # Sector ETFs
-            'XLF': 'Financial Select Sector SPDR Fund',
-            'XLE': 'Energy Select Sector SPDR Fund',
-            'XLV': 'Health Care Select Sector SPDR Fund',
-            'XLI': 'Industrial Select Sector SPDR Fund',
-            'XLY': 'Consumer Discretionary Select Sector SPDR Fund',
-            'XLP': 'Consumer Staples Select Sector SPDR Fund',
-            'XLU': 'Utilities Select Sector SPDR Fund',
-            'XLB': 'Materials Select Sector SPDR Fund',
-            
-            # Growth/Value
-            'VUG': 'Vanguard Growth ETF',
-            'VTV': 'Vanguard Value ETF',
-            'IWF': 'iShares Russell 1000 Growth ETF',
-            'IWD': 'iShares Russell 1000 Value ETF',
-            
-            # Dividend ETFs
-            'VYM': 'Vanguard High Dividend Yield ETF',
-            'SCHD': 'Schwab US Dividend Equity ETF',
-            'DVY': 'iShares Select Dividend ETF',
-            'HDV': 'iShares High Dividend ETF'
+            # International Developed Markets
+            'INTERNATIONAL_DEVELOPED': {
+                'EFA': 'iShares MSCI EAFE ETF',
+                'VEA': 'Vanguard FTSE Developed Markets ETF',
+                'IEFA': 'iShares Core MSCI EAFE IMI Index ETF',
+                'SCHF': 'Schwab International Equity ETF',
+                'VTEB': 'Vanguard Tax-Exempt Bond ETF',
+                'VXUS': 'Vanguard Total International Stock ETF'
+            }
         }
+        
+        # Create a flattened version for backward compatibility
+        self.extended_etf_list = {}
+        for country, etfs in self.global_etf_database.items():
+            self.extended_etf_list.update(etfs)
     
     def get_etf_info(self, symbol):
         """Get basic ETF information"""
@@ -261,3 +387,43 @@ class ETFAnalyzer:
     def get_all_etfs(self):
         """Get all available ETFs for selection"""
         return self.extended_etf_list
+    
+    def get_etfs_by_country(self, country):
+        """Get ETFs filtered by country"""
+        return self.global_etf_database.get(country, {})
+    
+    def get_available_countries(self):
+        """Get list of available countries"""
+        return list(self.global_etf_database.keys())
+    
+    def search_etf_by_country(self, search_term, country=None):
+        """Search for ETFs by symbol or name, optionally filtered by country"""
+        search_term = search_term.upper().strip()
+        results = []
+        
+        # If country is specified, search only in that country
+        if country and country in self.global_etf_database:
+            etf_dict = self.global_etf_database[country]
+            country_name = country
+        else:
+            # Search in all countries
+            etf_dict = self.extended_etf_list
+            country_name = "All Countries"
+        
+        for symbol, name in etf_dict.items():
+            if (search_term in symbol.upper() or 
+                search_term in name.upper()):
+                # Find which country this ETF belongs to
+                etf_country = "Unknown"
+                for c, etfs in self.global_etf_database.items():
+                    if symbol in etfs:
+                        etf_country = c
+                        break
+                
+                results.append({
+                    'symbol': symbol, 
+                    'name': name,
+                    'country': etf_country
+                })
+        
+        return results
