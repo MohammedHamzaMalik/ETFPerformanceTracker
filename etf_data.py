@@ -265,7 +265,7 @@ class ETFAnalyzer:
             # Calculate CAGR
             cagr = ((last_price / first_price) ** (1/years) - 1) * 100
             
-            return cagr, start_date.date(), years
+            return cagr, start_date.to_pydatetime().date(), years
             
         except Exception as e:
             st.warning(f"Could not calculate CAGR for {symbol}: {str(e)}")

@@ -17,7 +17,7 @@ class InvestmentCalculator:
             hist = ticker.history(period="max")
             info = ticker.info
             
-            if hist.empty:
+            if hist.empty or len(hist) < 2:
                 return None
             
             # Get expense ratio
@@ -72,8 +72,8 @@ class InvestmentCalculator:
                 'expense_ratio': expense_ratio * 100,  # Convert to percentage
                 'total_fees': total_fees,
                 'years': years,
-                'start_date': start_date.to_pydatetime().strftime('%Y-%m-%d'),
-                'end_date': end_date.to_pydatetime().strftime('%Y-%m-%d'),
+                'start_date': start_date.date(),
+                'end_date': end_date.date(),
                 'growth_data': growth_data
             }
             
@@ -99,13 +99,11 @@ class InvestmentCalculator:
             if expense_ratio > 0:
                 # Calculate years elapsed for each data point
                 start_date = sampled_hist.index[0]
-                sampled_hist['Years_Elapsed'] = [(date - start_date).days / 365.25 for date in sampled_hist.index]
+                years_elapsed = [(date - start_date).days / 365.25 for date in sampled_hist.index]
                 
                 # Apply compound expense ratio reduction
-                sampled_hist['Net_Portfolio_Value'] = (
-                    sampled_hist['Gross_Portfolio_Value'] * 
-                    ((1 - expense_ratio) ** sampled_hist['Years_Elapsed'])
-                )
+                expense_multipliers = [(1 - expense_ratio) ** years for years in years_elapsed]
+                sampled_hist['Net_Portfolio_Value'] = sampled_hist['Gross_Portfolio_Value'] * expense_multipliers
             else:
                 sampled_hist['Net_Portfolio_Value'] = sampled_hist['Gross_Portfolio_Value']
             
@@ -128,7 +126,7 @@ class InvestmentCalculator:
             ticker = yf.Ticker(symbol)
             hist = ticker.history(period="max")
             
-            if hist.empty:
+            if hist.empty or len(hist) < 2:
                 return None
             
             first_price = hist['Close'].iloc[0]
@@ -189,26 +187,6 @@ class InvestmentCalculator:
             
         except Exception as e:
             st.error(f"Error calculating future value: {str(e)}")
-            return None
-    
-    def calculate_required_investment(self, target_value, annual_rate, years):
-        """Calculate required initial investment to reach target value"""
-        try:
-            # Present value calculation
-            monthly_rate = annual_rate / 100 / 12
-            months = years * 12
-            
-            required_investment = target_value / ((1 + monthly_rate) ** months)
-            
-            return {
-                'required_investment': required_investment,
-                'target_value': target_value,
-                'annual_rate': annual_rate,
-                'years': years
-            }
-            
-        except Exception as e:
-            st.error(f"Error calculating required investment: {str(e)}")
             return None
     
     def get_risk_metrics(self, symbol, period="2y"):

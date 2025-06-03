@@ -5,8 +5,8 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import yfinance as yf
-from etf_data import ETFAnalyzer
-from calculators import InvestmentCalculator
+from etf_data_fixed import ETFAnalyzer
+from calculators_fixed import InvestmentCalculator
 
 # Page configuration
 st.set_page_config(
