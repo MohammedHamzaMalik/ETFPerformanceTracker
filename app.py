@@ -5,7 +5,7 @@ import plotly.express as px
 import plotly.graph_objects as go
 from datetime import datetime, timedelta
 import yfinance as yf
-from etf_data import ETFAnalyzer
+from etf_data_fixed import get_etf_info, get_top_etfs
 from calculators import InvestmentCalculator
 
 # Page configuration
